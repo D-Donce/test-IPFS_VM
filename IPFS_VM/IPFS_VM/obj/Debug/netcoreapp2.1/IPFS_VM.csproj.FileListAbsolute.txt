@@ -1,0 +1,11 @@
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\obj\Debug\netcoreapp2.1\IPFS_VM.csprojAssemblyReference.cache
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\obj\Debug\netcoreapp2.1\IPFS_VM.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\obj\Debug\netcoreapp2.1\IPFS_VM.AssemblyInfoInputs.cache
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\obj\Debug\netcoreapp2.1\IPFS_VM.AssemblyInfo.cs
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\bin\Debug\netcoreapp2.1\IPFS_VM.deps.json
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\bin\Debug\netcoreapp2.1\IPFS_VM.runtimeconfig.json
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\bin\Debug\netcoreapp2.1\IPFS_VM.runtimeconfig.dev.json
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\bin\Debug\netcoreapp2.1\IPFS_VM.dll
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\bin\Debug\netcoreapp2.1\IPFS_VM.pdb
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\obj\Debug\netcoreapp2.1\IPFS_VM.dll
+C:\Users\Lenovo\OneDrive\바탕 화면\IPFS_VM\IPFS_VM\obj\Debug\netcoreapp2.1\IPFS_VM.pdb
