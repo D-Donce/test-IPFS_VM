@@ -10,6 +10,12 @@ using System.Threading.Tasks;
 
 namespace IPFS_VM
 {
+    public static class Global
+    {
+        public static string beforehash = null;
+        //난의도 5 고정
+        public static int difficulty_level = 5;
+    }
     class Program
     {
         static void Main(string[] args)
@@ -21,9 +27,9 @@ namespace IPFS_VM
                 string[] a = utcDate.ToString(culture).Split(' '),
                     b = a[1].Split(':');
 
-                if (Int16.Parse(b[2]) % 5 == 0)
+                if (Int16.Parse(b[2]) % Global.difficulty_level == 0)
                 {
-                    Console.WriteLine(utcDate.ToString(culture));
+                    Console.WriteLine("미국 국제 표준시 : " + utcDate.ToString(culture));
                     IPFS program = new IPFS();
                     program.chaining();
                     Thread.Sleep(1000);
@@ -38,8 +44,13 @@ namespace IPFS_VM
         public string Block { get; set; }
         public void chaining()
         {
+            //파일 경로 설정
             string path = @"C:\ipfs_directory";
-            string all_transaction = Soket(); //<<계획 변경 string빌더로 묶어 받아와야함
+
+            //소켓 데이터 수신
+            string all_transaction = Soket();
+
+            //블록 해시, 타임 string변수 선언
             string blockhash;
             string time;
 
@@ -57,7 +68,6 @@ namespace IPFS_VM
             var culture = new CultureInfo("en-US");
             time = utcDate.ToString(culture);
             blockhash = SHA256Hash(time); //블럭 헤더
-            Console.WriteLine("{0} - UTC date and time: {1}\n{2}", culture.NativeName, utcDate.ToString(culture), blockhash);
 
             string pathblock = path + @"\formain\" + blockhash;
             if (Directory.Exists(pathblock) == false)
@@ -65,37 +75,84 @@ namespace IPFS_VM
                 Directory.CreateDirectory(pathblock);//블럭 생성
 
                 Directory.CreateDirectory(pathblock + @"\Body");//블럭 바디
-                string all_transaction_head = Transaction(pathblock + @"\Body", all_transaction);
-                if (!File.Exists(path))//블럭헤더
+
+                if (!File.Exists(path))//블럭 헤더
                 {
-                    File.Create(pathblock + @"\Header.txt");
-                    TxtWrite(pathblock + @"\Header.txt", "이전 블록 해시" + "//" + MerkleTree(all_transaction_head) + "//" + time);
+                    Random randomObj = new Random();
+                    int max = randomObj.Next(20);
+
+                    TxtWrite(pathblock + @"\Header.txt",
+                        "//HeaderJustBefore:"+ Global.beforehash +
+                        "//MerkleTree:" + MerkleTree(Transaction(pathblock + @"\Body", all_transaction, max)) +
+                        "//Timestamp:" + time +
+                        "//difficulty:" + Global.difficulty_level.ToString());
+
+                    //헤더 생성 성공
+                    Console.WriteLine("{0} - UTC date and time: {1}\n{2}", culture.NativeName, utcDate.ToString(culture), blockhash);
+                    Global.beforehash = blockhash;
                 }
             } //블럭 판별 생성
         }
 
-        public string Transaction(string path, string data)
+        public string Transaction(string path1, string data, int max)
         {
-            //트렌젝션
+            StringBuilder all_transaction_header = new StringBuilder();
 
-            //data 파싱
+            for (int i = -1; i < max; i++)
+            {
+                DateTime utcDate = DateTime.UtcNow;
+                var culture = new CultureInfo("en-US");
 
-            string pasing = null;
-            string all_transaction_head = null; //스트링 빌더 사용
+                string time = utcDate.ToString(culture);
+                string transaction_header = SHA256Hash(time + i.ToString());
+                string path2 = path1 + @"\" + transaction_header + ".txt";
 
-            TxtWrite(path, pasing);
-            return all_transaction_head;
+                StringBuilder transaction_body = new StringBuilder();
+                transaction_body.Append("Layertype:formain//Timestamp:");
+                transaction_body.Append(time);
+                transaction_body.Append("//");
+                transaction_body.Append(i.ToString());
+                transaction_body.Append("//ref_hash:null&hash_type:null//ref_hash:null&hash_type:null//");
+                transaction_body.Append("DKey");
+                transaction_body.Append("//");
+
+                //바이너리 데이터를 string으로 변환시 실행오류 발생
+                transaction_body.Append(data);
+
+                TxtWrite(path2, transaction_body.ToString());
+
+                all_transaction_header.Append(transaction_header + "//");
+            }
+
+            return all_transaction_header.ToString();
         }
-        public string MerkleTree(string path)
+        public string MerkleTree(string all_transaction_header)
         {
-            //헤싱을 통한 트리구조 ','로 구분하여 정렬
-            //스트링 빌더 사용
-            return null;
+            string[] transaction_headsers = all_transaction_header.Split("//");
+            int length = transaction_headsers.Length;
+
+            StringBuilder merkledata = new StringBuilder();
+
+            while (length != 0)
+            {
+                string[] arr = new string[length];
+
+                for (int i = 0; i < length-2; i+=3)
+                {
+                    merkledata.Append(SHA256Hash(transaction_headsers[i] + transaction_headsers[i + 1]));
+                    merkledata.Append("//");
+                }
+                length /= 2;
+                merkledata.Append("||");
+            }
+
+
+            return merkledata.ToString();
         }
         private void TxtWrite(string path, string abcd)
         {
             StreamWriter writer;
-            writer = File.AppendText(path);
+            writer = File.CreateText(path);
             writer.WriteLine(abcd);
             writer.Close();
         }
@@ -121,6 +178,7 @@ namespace IPFS_VM
             {
                 // 소켓 접속
                 client.Connect(ipep);
+
                 // 접속이 되면 Task로 병렬 처리
                 new Task(() =>
                 {
